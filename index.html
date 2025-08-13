@@ -16,8 +16,8 @@ body { background-color: black; color: #aaa; font-family: "Source Code Pro"; }
 #editor-container { position: relative; width: 100%; height: 150px; margin-bottom: 15px; }
 #editor-container, #textInput, #highlightLayer {}
 #textInput, #highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 0; padding: 5px; font-family: "Source Code Pro", monospace; font-size: 14px; line-height: 1.25; background-color: transparent; color: #aaa; white-space: pre-wrap; border: 1px solid #ccc; overflow: scroll; box-sizing: border-box; }
-#textInput { z-index: 1; color: transparent; background-color: transparent; caret-color: #aaa; }
-#highlightLayer { z-index: 0; pointer-events: none; }
+#textInput { z-index: 1; color: transparent; background-color: transparent; caret-color: #aaa; overflow-wrap: anywhere;}
+#highlightLayer { z-index: 0; pointer-events: none; overflow-wrap: anywhere;}
 .highlight { color: #696969; }
 .highlightNormal { color: #3a3a3a; }
 .footer { position: relative; right: 10px; text-align: right; width: 100%; }

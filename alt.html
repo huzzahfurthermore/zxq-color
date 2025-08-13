@@ -98,7 +98,7 @@ a { color: #aaa; }
               const idx = parseInt(lily);
               currentColor = xtermToRgbHex(idx);
             } 
-          } else if (normal) { currentLine += "";
+          } else if (normal) { currentLine += ""; currentColor = "#aaa";
           } else if (bright) { currentLine += ""; currentColor = "#ffffff";
           } else if (textContent) {
             if (textContent === "\n") {

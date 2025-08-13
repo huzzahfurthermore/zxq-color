@@ -47,7 +47,7 @@ a { color: #aaa; }
 			colorDiv.classList.add('color');
 			colorDiv.style.backgroundColor = colorName;
 			colorDiv.title = code;
-			// colorDiv.innerHTML = "<span class='colorText'><center>" + code + "</center></span>";
+		// 	colorDiv.innerHTML = "<span class='colorText'><center>" + code + "</center></span>";
 			colorDiv.addEventListener('click', function () {
 				applyColor(colorName, parseInt(code));
 			});
@@ -120,7 +120,7 @@ a { color: #aaa; }
               const idx = parseInt(lily);
               currentColor = xtermToRgbHex(idx);
             } 
-          } else if (normal) { currentLine += "";
+          } else if (normal) { currentLine += ""; currentColor = "#aaa";
           } else if (bright) { currentLine += ""; currentColor = "#ffffff";
           } else if (textContent) {
             if (textContent === "\n") {

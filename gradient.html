@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <!-- If you're reading this, you might like this tool, but it would be NICE if you could credit me somehow.
+         Demon, Despair, Asmodeus, or Jeff. https://www.github.com/coffee-nerd/
+         Please leave this line in the code. Preferably we can collaborate and you can just make a pull request. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sindome Gradient Generator</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Quantico:400,400italic,700">
+    <style>
+#output,textarea{border:1px solid #444;background-color:#111;padding:10px}body,label,textarea{color:#fff}#output,select,textarea{background-color:#111}.custom-gradient-item input[type=text],label,select{margin-right:5px}body{background-color:#000;font-family:"Source Code Pro",monospace;padding:20px}#output{white-space:pre-wrap;}#controls,label{font-size:1rem}textarea{width:100%;height:150px;font-family:inherit;resize:vertical}.custom-gradient-input,select{padding:5px;color:#fff;border:1px solid #444;font-family:inherit}.preview-box{display:inline-block;vertical-align:middle;width:100px;height:20px;margin-left:5px;border:1px solid #444;background:#000}.mode-selector input{margin-right:5px}.disabled{opacity:.5;pointer-events:none}.custom-gradient-input{background-color:#111}#toggleCustomGradientButton,#toggleManageCustomGradients{background-color:#111;color:#fff;border:1px solid #444;padding:5px 10px;font-family:inherit;cursor:pointer;margin-bottom:10px}@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}.shake{animation:.3s shake}.invalid{border:2px solid red!important}#manageCustomGradients{display:none;border:1px solid #444;padding:10px;margin-top:10px}#manageCustomGradients h3{margin-top:0}.help-text{font-size:.8rem;color:#888}.custom-gradient-item{display:flex;align-items:center;margin-bottom:5px;border-bottom:1px solid #444;padding-bottom:5px}.custom-gradient-preview{width:80px;height:20px;border:1px solid #444;margin-right:10px}.cred,#charCounter{float:right;color:#888;font-size:.9rem;margin-top:5px}#charCounter.over-limit,.line-char-count.over-limit{color:red}.output-container{position:relative}.line-char-count{color:#666;font-size:.8rem;display:inline-block;margin-left:10px;user-select:none;white-space:nowrap;position:absolute;right:10px}.copy-container{position:relative;display:inline-block;width:100%}.copy-button{position:absolute;top:8px;right:8px;background-color:#333;color:#fff;border:1px solid #555;padding:6px 12px;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;z-index:10;transition:.2s}.copy-button:hover{background-color:#444;border-color:#666}.copy-button:active{background-color:#222;transform:translateY(1px)}.copy-button.copied{background-color:#0a5d0a;border-color:#0f8f0f}a,a:visited{font-size:1rem;color:#aaa;}
+    </style>
+  </head>
+  <body>
+    <div id="controls">
+      <!-- Text Input -->
+      <div style="margin-right:20px;"><textarea id="textInput" placeholder="Put your text here..."></textarea></div>
+      <br>
+      <!-- Gradient Selection -->
+      <div id="gradientControls" style="display:flex;justify-content:space-between;">
+          <div>
+        <div>
+          <label for="gradientSelect">Gradient:</label><select id="gradientSelect"></select><span class="preview-box" id="gradientPreview" style="background: linear-gradient(to right, rgb(255, 255, 0), rgb(204, 255, 0), rgb(102, 255, 51), rgb(51, 255, 102), rgb(0, 255, 204), rgb(0, 255, 255), rgb(0, 204, 255), rgb(51, 102, 255), rgb(102, 51, 255), rgb(204, 0, 255), rgb(255, 0, 255), rgb(255, 0, 204), rgb(255, 51, 153), rgb(255, 51, 102), rgb(255, 102, 51), rgb(255, 153, 51), rgb(255, 204, 0));"></span>
+          <input type="checkbox" id="invertGradient"><label for="invertGradient">Invert</label>
+        
+        <!-- Pattern Selection -->
+         <select id="patternSelect">
+            <option value="original">Original</option>
+            <option value="symmetrical">Symmetrical</option>
+            <option value="distributed">Distributed</option>
+          </select>
+        </div>
+        <!-- Format Controls -->
+        <div>
+          <label for="wrapLimit">Split lines:</label>
+          <input type="number" id="wrapLimit" min="20" max="200" value="80" style="width: 60px; background-color: #111; color: white; border: 1px solid #444; padding: 5px; font-family: inherit;">
+          <button id="formatButton" style="background-color: #111; color: white; border: 1px solid #444; padding: 5px 10px; font-family: inherit; cursor: pointer;">Format</button>
+          <span style="color:#888;font-size:.9rem;">Short lines will merge unless you use '||||' or '||'.</span>
+        </div>
+        <!-- Toggle button for Custom Gradient -->
+        <div><input type="button" id="toggleCustomGradientButton" value="Create custom gradient"></div>
+        <!-- Add New Gradients (hidden by default) -->
+        <div id="addGradient" style="display: none;">
+          <div>
+            <input type="text" id="newGradientName" placeholder="Gradient Name" required="" pattern="^[\w\s]+$" title="Enter a name (letters, numbers, and spaces only)" class="custom-gradient-input">
+            <small class="help-text">Enter '@colors 256' in-game to see available colors</small>
+            <br>
+            <input type="text" id="newGradientCodes" placeholder="Color Codes" required="" pattern="^(?:[0-9]{1,3}(?:\s+[0-9]{1,3})*)$" title="Enter space-separated numbers between 1 and 256" class="custom-gradient-input">
+            <small class="help-text">E.g.: 54 55 56 57</small>
+            <span class="preview-box" id="customGradientPreview"></span>
+            <input type="button" id="newGradientProcess" value="Add" style="background-color: #111; color: white; border: 1px solid #444; padding: 5px 10px; font-family: inherit; cursor: pointer;">
+          </div>
+        </div>
+        <!-- Toggle button for managing custom gradients -->
+        <div><input type="button" id="toggleManageCustomGradients" value="Manage custom gradients"></div>
+        <!-- Manage Custom Gradients Section -->
+        <div id="manageCustomGradients">
+          <h3>Custom Gradients</h3>
+          <div id="customGradientsList"></div>
+        </div>
+        <!-- Pattern Selection - Removed from here -->
+      </div>
+      <div>
+          
+        <pre style="margin:5px 20px 0px 10px;display:inline-flex">
+a |||| b
+becomes
+a
+
+b
+        </pre>
+        <pre style="margin: 5px 0px 0px 10px;display:inline-flex">
+a || b
+becomes
+a
+b
+        </pre>
+        </div>
+    </div>
+</div>
+
+    <div class="output-container">
+      <div id="output" style="background:black"></div>
+      <div id="charCounter" style="display:none">Total Characters: 0</div>
+    </div>
+
+    <div style="margin-right:20px;">
+      <div class="copy-container">
+        <textarea id="copyableOutput" style="width: 100%; height: 150px; background-color: #111; color: white; border: 1px solid #444; padding: 10px; font-family: inherit; resize: vertical;" readonly="" placeholder="Codes will appear here..."></textarea>
+        <button id="copyButton" class="copy-button" title="Copy to clipboard">Copy</button>
+      </div>
+    </div>
+    <p class="cred">Modified version of <a href="https://github.com/Coffee-Nerd/MUD-Colorizer">MUD Colorizer</a> by coffee-nerd ⚜ <a href="https://ansicolortool.neocities.org/">Colorizer</a></p>
+
+    <script>
+      // Standard 16 color mapping
+      const standardColorMap = {k: "#000000",K: "#555555",r: "#800000",R: "#ff0000",g: "#008000",G: "#00ff00",y: "#808000",Y: "#ffff00",b: "#000080",B: "#0000ff",m: "#800080",M: "#ff00ff",c: "#008080",C: "#00ffff",w: "#c0c0c0",W: "#ffffff",D: "#333333",};
+
+      // Map standard color letters to an xterm index
+      const standardColorToIndex = {k: 0,K: 8,r: 1,R: 9,g: 2,G: 10,y: 3,Y: 11,b: 4,B: 12,m: 5,M: 13,c: 6,C: 14,w: 7,W: 15,D: 8,};
+
+      // Convert an Xterm color index (1-256) into an RGB hex color
+      function xtermToRgbHex(colorIndex) {
+          const standardColors = ["#ccc","#000000","#800000","#008000","#808000","#000080","#800080","#008080","#c0c0c0","#808080","#ff0000","#00ff00","#ffff00","#0000ff","#ff00ff","#00ffff","#ffffff","#000000","#00005f","#000087","#0000af","#0000d7","#0000ff","#005f00","#005f5f","#005f87","#005faf","#005fd7","#005fff","#008700","#00875f","#008787","#0087af","#0087d7","#0087ff","#00af00","#00af5f","#00af87","#00afaf","#00afd7","#00afff","#00d700","#00d75f","#00d787","#00d7af","#00d7d7","#00d7ff","#00ff00","#00ff5f","#00ff87","#00ffaf","#00ffd7","#00ffff","#5f0000","#5f005f","#5f0087","#5f00af","#5f00d7","#5f00ff","#5f5f00","#5f5f5f","#5f5f87","#5f5faf","#5f5fd7","#5f5fff","#5f8700","#5f875f","#5f8787","#5f87af","#5f87d7","#5f87ff","#5faf00","#5faf5f","#5faf87","#5fafaf","#5fafd7","#5fafff","#5fd700","#5fd75f","#5fd787","#5fd7af","#5fd7d7","#5fd7ff","#5fff00","#5fff5f","#5fff87","#5fffaf","#5fffd7","#5fffff","#870000","#87005f","#870087","#8700af","#8700d7","#8700ff","#875f00","#875f5f","#875f87","#875faf","#875fd7","#875fff","#878700","#87875f","#878787","#8787af","#8787d7","#8787ff","#87af00","#87af5f","#87af87","#87afaf","#87afd7","#87afff","#87d700","#87d75f","#87d787","#87d7af","#87d7d7","#87d7ff","#87ff00","#87ff5f","#87ff87","#87ffaf","#87ffd7","#87ffff","#af0000","#af005f","#af0087","#af00af","#af00d7","#af00ff","#af5f00","#af5f5f","#af5f87","#af5faf","#af5fd7","#af5fff","#af8700","#af875f","#af8787","#af87af","#af87d7","#af87ff","#afaf00","#afaf5f","#afaf87","#afafaf","#afafd7","#afafff","#afd700","#afd75f","#afd787","#afd7af","#afd7d7","#afd7ff","#afff00","#afff5f","#afff87","#afffaf","#afffd7","#afffff","#d70000","#d7005f","#d70087","#d700af","#d700d7","#d700ff","#d75f00","#d75f5f","#d75f87","#d75faf","#d75fd7","#d75fff","#d78700","#d7875f","#d78787","#d787af","#d787d7","#d787ff","#d7af00","#d7af5f","#d7af87","#d7afaf","#d7afd7","#d7afff","#d7d700","#d7d75f","#d7d787","#d7d7af","#d7d7d7","#d7d7ff","#d7ff00","#d7ff5f","#d7ff87","#d7ffaf","#d7ffd7","#d7ffff","#ff0000","#ff005f","#ff0087","#ff00af","#ff00d7","#ff00ff","#ff5f00","#ff5f5f","#ff5f87","#ff5faf","#ff5fd7","#ff5fff","#ff8700","#ff875f","#ff8787","#ff87af","#ff87d7","#ff87ff","#ffaf00","#ffaf5f","#ffaf87","#ffafaf","#ffafd7","#ffafff","#ffd700","#ffd75f","#ffd787","#ffd7af","#ffd7d7","#ffd7ff","#ffff00","#ffff5f","#ffff87","#ffffaf","#ffffd7","#ffffff","#080808","#121212","#1c1c1c","#262626","#303030","#3a3a3a","#444444","#4e4e4e","#585858","#626262","#6c6c6c","#767676","#808080","#8a8a8a","#949494","#9e9e9e","#a8a8a8","#b2b2b2","#bcbcbc","#c6c6c6","#d0d0d0","#dadada","#e4e4e4","#eeeeee"];
+          return standardColors[colorIndex];
+      }
+
+      // This regex will match any valid color code token in group1,
+      // and if not a valid token, it will match any single character (including $, @, {, &)
+      // in group2.
+      const regex = /(\%\(\d{3}\))|(\%normal)|(\%bright)|([\s\S])/g;
+
+      function renderXterm(text) {
+        let output = "";
+        let currentColor = "#ffffff";
+        let lineCharCount = 0;
+        let lines = [];
+        let currentLine = "";
+
+        text.replace(regex, (match, colorCode, normal, bright, textContent) => {
+          if (colorCode) {
+            if (colorCode.startsWith("%(")) {
+              const lily = colorCode.slice(2, -1);
+              const idx = parseInt(lily);
+              currentColor = xtermToRgbHex(idx);
+            } 
+          } else if (normal) {
+             currentLine += "";
+          } else if (bright) {
+              currentLine += "";
+              currentColor = "#ffffff";
+          } else if (textContent) {
+            if (textContent === "\n") {
+              lines.push({ content: currentLine, count: lineCharCount });
+              currentLine = "";
+              lineCharCount = 0;
+            } else {
+              if (/\s/.test(textContent)) {
+                currentLine += escapeHtml(textContent);
+              } else {
+                currentLine += `<span style="color: ${currentColor}">${escapeHtml(textContent)}</span>`;
+              }
+              lineCharCount++;
+            }
+          }
+        });
+        
+        // Add the last line if it has content
+        if (currentLine) {lines.push({ content: currentLine, count: lineCharCount });}
+        
+        // Build the output with line character counts
+        lines.forEach(line => {
+            if (line.content == "") {output += `<div style="position: relative; padding-right: 40px;"><span> </span><span class="line-char-count">${line.count}</span></div>`;
+            } else {output += `<div style="position: relative; padding-right: 40px;">${line.content}<span class="line-char-count">${line.count}</span></div>`;}
+        });
+        
+        return output;
+      }
+
+      function escapeHtml(text) {
+        const map = {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#039;",
+        };
+        return text.replace(/[&<>"']/g, function (m) {return map[m];});
+      }
+
+      function wrapColorCode(colorIndex) {
+        if (colorIndex == 16 || colorIndex == "232") {
+          return `%bright`;
+        } else {return `%(${String(colorIndex).padStart(3, "0")})`;}
+    }
+
+      function convertColorCodesToFormat(text, newFormat) {
+        let converted = "";
+        text.replace(regex, (match, colorCode, textContent) => {
+          if (colorCode) {
+            let colorIndex = null;
+            if (colorCode.startsWith("%(")) {colorIndex = parseInt(colorCode.slice(2), 10);} 
+            converted += wrapColorCode(colorIndex);
+          } else if (textContent) {converted += textContent;}
+        });
+        return converted;
+      }
+
+      function applyOriginalPattern(text, colors) {
+        let result = "";
+        let lastColorIndex = null;
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const colorIndex = colors[i % colors.length];
+          if (!/\s/.test(char) && colorIndex !== lastColorIndex) {
+            if (!result.endsWith("%normal\n") && result != "") {result += "%normal"+wrapColorCode(colorIndex);}
+            else { result += wrapColorCode(colorIndex);}
+            lastColorIndex = colorIndex;
+          }
+          
+            if (char != "\n" && char != " ") { result += char;
+            } else if (char == " ") { result += char;
+            } else {result += "%normal\n"+wrapColorCode(colorIndex)}
+        }
+        return result.replaceAll("\n%normal","%normal\n")+"%normal";
+      }
+
+      function distributeColorsEvenly(text, colors) {
+        const n = text.length;
+        const c = colors.length;
+        if (n === 0) return "";
+        const baseSize = Math.floor(n / c);
+        let remainder = n % c;
+        let segments = [];
+        let startIndex = 0;
+        for (let i = 0; i < c; i++) {
+          const segmentSize = baseSize + (remainder > 0 ? 1 : 0);
+          remainder = remainder > 0 ? remainder - 1 : remainder;
+          const segment = text.slice(startIndex, startIndex + segmentSize);
+          startIndex += segmentSize;
+          segments.push({ segment, colorIndex: colors[i] });
+        }
+        let result = "";
+        segments.forEach(({ segment, colorIndex }) => {
+          if (!segment) return;
+          let lastColorIndex = 0;
+            const char = segment;
+            if (colorIndex !== lastColorIndex) {
+              if (!result.endsWith("\n") && result != "") {result += "%normal"+wrapColorCode(colorIndex);}
+              else { result += wrapColorCode(colorIndex);}
+              lastColorIndex = colorIndex;
+            }
+            // console.log(segment, colorIndex)
+            colly = "%normal\n" + wrapColorCode(colorIndex)
+            charry = char.replaceAll("\n",colly);
+            if (char != "\n") { result += charry;
+            } else {result += "%normal\n"+wrapColorCode(colorIndex);}
+        });
+        return result.replaceAll("\n%normal","%normal\n")+"%normal";
+      }
+
+      function applySymmetricalPattern(text, colors) {
+        const c = colors.length;
+        if (c < 2) { return applyOriginalPattern(text, colors); }
+        let result = "";
+        let lastColorIndex = null;
+        const cycleLength = 2 * c - 2;
+        for (let i = 0; i < text.length; i++) {
+          let mod = i % cycleLength;
+          if (mod >= c) { mod = cycleLength - mod; }
+          const colorIndex = colors[mod];
+          const char = text[i];
+          if (!/\s/.test(char) && colorIndex !== lastColorIndex) {
+            if (!result.endsWith("%normal\n")  && result != "") {result += "%normal"+wrapColorCode(colorIndex);}
+            else { result += wrapColorCode(colorIndex);}
+            lastColorIndex = colorIndex;
+          }
+            if (char != "\n" && char != " ") { result += char;   
+            } else if (char == " ") { result += char;
+            } else {result += "%normal\n"+wrapColorCode(colorIndex);}
+        }
+        return result.replaceAll("\n%normal","%normal\n")+"%normal";
+      }
+
+
+      function formatText(text) {
+        const wrapLimit = parseInt(document.getElementById("wrapLimit").value) || 80;
+        
+        // First, extract all words from the entire text (merging lines)
+        const allWords = [];
+        let currentWord = "";
+        let i = 0;
+        
+        // Replace newlines with spaces to merge lines
+        const mergedText = text.replace(/\n+/g, ' ');
+        
+        while (i < mergedText.length) {
+          const remaining = mergedText.slice(i);
+          const colorMatch = remaining.match(/^(\%\(\d{3}\))/);
+          
+          if (colorMatch) {
+            currentWord += colorMatch[0];
+            i += colorMatch[0].length;
+          } else {
+            const char = mergedText[i];
+            if (char === ' ') {
+              if (currentWord) {
+                allWords.push(currentWord);
+                currentWord = "";
+              }
+            } else {
+              currentWord += char;
+            }
+            i++;
+          }
+        }
+        
+        // Don't forget the last word
+        if (currentWord) {
+          allWords.push(currentWord);
+        }
+        
+        // Now reflow all words into properly formatted lines
+        const formattedLines = [];
+        let currentLine = "";
+        let currentLineLength = 0;
+        
+        allWords.forEach((word) => {
+          // Calculate visible length of word
+          const visibleWord = word.replace(
+            /\%\(\d{3}\)|\%normal|\%bright/g,
+            ""
+          );
+          const wordLength = visibleWord.length;
+          
+          if (currentLineLength === 0) {
+            // First word on line
+            currentLine = word + " ";
+            currentLineLength = wordLength + 1;
+          } else if (word === "||||") {
+            formattedLines.push(currentLine);
+            currentLine = "";
+            currentLineLength = 0;
+            formattedLines.push(currentLine);
+            currentLineLength = wordLength;
+          } else if (word === "||") {
+            formattedLines.push(currentLine);
+            currentLine = "";
+            currentLineLength = 0;
+          } else if (currentLineLength + 1 + wordLength <= wrapLimit) {
+            // Word fits on current line with space
+            currentLine += word + " ";
+            currentLineLength += 1 + wordLength;
+          } else {
+            // Word doesn't fit, start new line
+            formattedLines.push(currentLine);
+            currentLine = word + " ";
+            currentLineLength = wordLength + 1;
+          }
+        });
+        
+        // Add the last line
+        if (currentLine) {
+          formattedLines.push(currentLine);
+        }
+        
+        return formattedLines.join('\n');
+      }
+
+
+      function applyGradient() {
+        const textInput = document.getElementById("textInput");
+        const copyableOutput = document.getElementById("copyableOutput");
+        const text = originalText;
+        const pattern = document.getElementById("patternSelect").value;
+        const select = document.getElementById("gradientSelect");
+        const invert = document.getElementById("invertGradient").checked;
+        const index = select.selectedIndex;
+        if (index < 0) return;
+        const gradient = gradients[index];
+        const colors = invert ? gradient.colors.slice().reverse() : gradient.colors;
+        let gradientText = "";
+        if (pattern === "original") {
+          gradientText = applyOriginalPattern(text, colors);
+        } else if (pattern === "distributed") {
+          gradientText = distributeColorsEvenly(text, colors);
+        } else if (pattern === "symmetrical") {
+          gradientText = applySymmetricalPattern(text, colors);
+        }
+        
+        // Keep the input clean, put colored text in copyable output
+        textInput.value = text;
+        copyableOutput.value = gradientText;
+        
+        // Restore cursor position if we have one saved
+        if (window.savedPlainCursorPos !== undefined) {
+          textInput.setSelectionRange(window.savedPlainCursorPos, window.savedPlainCursorPos);
+          window.savedPlainCursorPos = undefined;
+        }
+        
+        originalText = text;
+        updateOutput(gradientText);
+      }
+
+      function updateOutput(coloredText) {
+        // Use colored text if provided, otherwise get from copyable output
+        const textToRender = coloredText || document.getElementById("copyableOutput").value || document.getElementById("textInput").value;
+        document.getElementById("output").innerHTML = renderXterm(textToRender);
+        
+        // Update character counter based on clean text
+        const cleanText = document.getElementById("textInput").value;
+        document.getElementById("charCounter").textContent = `Total Characters: ${cleanText.length}`;
+      }
+
+      function updateGradientPreview() {
+        const select = document.getElementById("gradientSelect");
+        const index = select.selectedIndex;
+        if (index < 0) return;
+        const gradient = gradients[index];
+        const preview = document.getElementById("gradientPreview");
+        if (gradient.colors.length > 1) {
+          const invert = document.getElementById("invertGradient").checked;
+          const colors = invert ? gradient.colors.slice().reverse() : gradient.colors;
+          preview.style.background = `linear-gradient(to right, ${colors
+            .map(xtermToRgbHex)
+            .join(", ")})`;
+        } else if (gradient.colors.length === 1) {
+          preview.style.background = `${xtermToRgbHex(gradient.colors[0])}`;
+        } else { preview.style.background = `black`; }
+      }
+
+      function createGradientOptionPreviews() {
+        const select = document.getElementById("gradientSelect");
+        Array.from(select.options).forEach((option, index) => {
+          const gradient = gradients[index];
+          const gradientCanvas = document.createElement("canvas");
+          gradientCanvas.width = 100;
+          gradientCanvas.height = 20;
+          const ctx = gradientCanvas.getContext("2d");
+          if (gradient.colors.length > 1) {
+            const gradientStyle = ctx.createLinearGradient(0, 0, gradientCanvas.width, 0);
+            gradient.colors.forEach((color, idx) => {
+              const stopPosition = gradient.colors.length > 1 ? idx / (gradient.colors.length - 1) : 0;
+              gradientStyle.addColorStop(stopPosition, xtermToRgbHex(color));
+            });
+            ctx.fillStyle = gradientStyle;
+            ctx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
+          } else if (gradient.colors.length === 1) {
+            ctx.fillStyle = xtermToRgbHex(gradient.colors[0]);
+            ctx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
+          } else {
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(0, 0, gradientCanvas.width, gradientCanvas.height);
+          }
+          const dataURL = gradientCanvas.toDataURL();
+          option.style.backgroundImage = `url(${dataURL})`;
+          option.style.backgroundSize = "cover";
+          option.style.backgroundRepeat = "no-repeat";
+          option.style.paddingLeft = "30px";
+        });
+      }
+
+      // --- Persistence using localStorage ---
+      function loadCustomGradients() {
+        const stored = localStorage.getItem("customGradients");
+        if (stored) {
+          try { return JSON.parse(stored);
+          } catch (e) { return []; }
+        }
+        return [];
+      }
+
+      function saveCustomGradients() { localStorage.setItem("customGradients", JSON.stringify(customGradients)); }
+
+      // --- Built-in and Custom Gradients ---
+      const builtInGradients = [
+        { name: "Pastelbow", colors: [227,191,120,85,51,52,46,70,100,166,202,201,206,205,210,216,221] },
+        { name: "Rainbow", colors: [197,209,227,47,52,88] },
+        { name: "Fire", colors: [209,167,125,95,96,168] },
+        { name: "Ocean", colors: [60,96,132,168,210,216] },
+        { name: "Mystic", colors: [125,133,139,146,151,156] },
+        { name: "Shadow Eclipse", colors: [60,96,132,168] },
+        { name: "Frosty Dawn", colors: [210,216,222] },
+        { name: "Eternal Ember", colors: [209,167,125,95,96] },
+        { name: "Ethereal Vex", colors: [209,125,95,101,137] },
+        { name: "Crystal Duality", colors: [96,60] },
+        { name: "Obsidian Mirage", colors: [62,63,98,97] },
+        { name: "Moonlight Trio", colors: [133,132,168] },
+        { name: "Dusk Crown", colors: [128,134,140] },
+        { name: "Dream Tides", colors: [146,152,151,152] },
+        { name: "Mystic Charm", colors: [146,140,134,128] },
+        { name: "Fallen Mark", colors: [222,221,179,173] },
+        { name: "Destiny Shard", colors: [131,95,197] },
+        { name: "Shattered Echo", colors: [125,89,53] },
+        { name: "Stormsong", colors: [173,179,221] },
+        { name: "Gale Helix", colors: [222,228,221] },
+        { name: "Inferno Crest", colors: [175,103,110] },
+        { name: "Abyss Sigil", colors: [132,96,60] },
+        { name: "Sunlit Peaks", colors: [158,122,86,50,51] },
+        { name: "Endless Dreams", colors: [97,98,104,98] },
+        { name: "Starlight Despair", colors: [97,61,62,98,97] },
+        { name: "Dream Eclipse", colors: [96,102,108,114,120,114,108,102] },
+        { name: "Everlasting Light", colors: [70,69,68,62] },
+        { name: "Ancient Havens", colors: [61,68,62,61] },
+        { name: "Eternal Radiance", colors: [227,228,229,230] },
+        { name: "Glory Flares", colors: [231,195,194,227] },
+        { name: "Gilded Infinity", colors: [202,208,214,220] },
+        { name: "Arcane Symbol", colors: [226,232,226,220] },
+        { name: "Shattered Stars", colors: [231,230,229,228] },
+        { name: "Eclipsed Glory", colors: [227,191,155] },
+        { name: "Flickering Fire", colors: [231,229,223,217] },
+        { name: "Burning Ash", colors: [215,179,131,95,96] },
+        { name: "Eternal Breeze", colors: [125,131,137] },
+        { name: "Flowing Mist", colors: [143,149,155,191,227] },
+        { name: "Sacred Dreams", colors: [97,104,111,112] },
+        { name: "Ember Relic", colors: [117,122,158,152] },
+        { name: "Enigmatic Shadows", colors: [73,86,85,79] },
+        { name: "Ancient Whisper", colors: [73,67,86,85] },
+        { name: "Eclipsed Crown", colors: [221,215,209,210,211] },
+        { name: "Eternal Shards", colors: [175,139,103] },
+        { name: "Mystery Echo", colors: [60,96,132,125,89,53] },
+        { name: "Olympian Dreams", colors: [112,111,154,196,154] },
+        { name: "Whispering Winds", colors: [146,189,182,175,132] },
+        { name: "Shattered Worlds", colors: [188,187,145,139,133] },
+        { name: "Mystic Wisdom", colors: [138,139,140,176,212] },
+        { name: "Radiant Arcane", colors: [28,64,100,136,172] },
+        { name: "Endless Nightfall", colors: [52,88,124,160] },
+        { name: "Elemental Fury", colors: [82,112,142,172,142] },
+        { name: "Steel Eclipse", colors: [34,40,46,40,34] },
+        { name: "Ghoul Glow", colors: [155,156,192,191,192,156,155] },
+        { name: "Celestial Scales", colors: [82,88,160,195,193,228,221,227,228,193,160,88,82] },
+        { name: "Solar Flare", colors: [197,209,221,227,221,209,197,34] },
+        { name: "Cerebral Rift", colors: [176,175,169,170,176,175,169,170] },
+        { name: "Abyssal Armor", colors: [70,69,68,62,61,62,68,69,70] },
+        { name: "Sunset Wail", colors: [232,226,219,212,205,198,205,212,219,226,232] },
+        { name: "Verdict Veil", colors: [143,144,145,151,152] },
+        { name: "Stratosphere Surge", colors: [42,88,160,195,193] },
+        { name: "Venomous Gaze", colors: [104,103,139,175,79] },
+        { name: "Moonlit Veil", colors: [221,222,228,229] },
+        { name: "Lush Meadow", colors: [47,83,119,155,191] },
+        { name: "Midnight Shadows", colors: [17,23,29,35,41,47] },
+        { name: "Sunset Blaze", colors: [203,167,131,95,59] },
+        { name: "Wailing Abomination", colors: [167,173,131,137,95,101,59,65,107,113,143,149] },
+        { name: "Putrid Funk", colors: [131,137,143,149,155,149,143,137,136,135,134,133] },
+        { name: "Gradient_Ex_Sequence_1",colors: [168,132,133,96,97,98,62,63,62,98,97,96,133,132,168] },
+        { name: "Gradient_Ex_Sequence_2", colors: [128,134,140,146,152,151,152,146,140,134,128] },
+        { name: "Gradient_Ex_Sequence_3", colors: [222,221,179,173,131,95,197,161,125,89,53] },
+        { name: "Gradient_Ex_Sequence_4", colors: [173,179,221,222,228,222,221,179,173] },
+        { name: "Gradient_Ex_Sequence_5", colors: [60,96,132,168,132,96,60] },
+        { name: "Gradient_Ex_Sequence_6", colors: [158,122,86,50,51,52,88,124,88,52,51,50] },
+        { name: "Gradient_Ex_Sequence_7", colors: [97,98,104,98,97,61,62,98,97] },
+        { name: "Gradient_Ex_Sequence_8", colors: [96,102,108,114,120,114,108,102,96,102] },
+        { name: "Gradient_Ex_Sequence_9", colors: [70,69,68,62,61,70,69,68,62,61] },
+        { name: "Gradient_Ex_Sequence_10", colors: [227,228,229,230,231,195,194] },
+        { name: "Gradient_Ex_Sequence_11", colors: [202,208,214,220,226,232,226,220,214,208,202,201] },
+        { name: "Gradient_Ex_Sequence_12", colors: [231,230,229,228,227,191,155,191,227,228,229,230] },
+        { name: "Gradient_Ex_Sequence_13", colors: [231,229,223,217,231,229,223,217,216] },
+        { name: "Gradient_Ex_Sequence_14", colors: [215,179,131,95,96,60,215,179,131,95,96,60] },
+        { name: "Gradient_Ex_Sequence_15", colors: [125,131,137,143,149,155,191,227,229] },
+        { name: "Gradient_Ex_Sequence_16", colors: [97,104,111,112,117,122,158,152,146,140] },
+        { name: "Gradient_Ex_Sequence_17", colors: [73,86,85,79,73,67,86,85,73] },
+        { name: "Gradient_Ex_Sequence_18", colors: [221,215,209,210,211,175,139,103,110,67,68] },
+        { name: "Gradient_Ex_Sequence_19", colors: [60,96,132,125,89,53] },
+        { name: "Gradient_Ex_Sequence_20", colors: [112,111,154,196,154,111,112] },
+        { name: "Gradient_Ex_Sequence_21", colors: [146,189,182,175,132,168,146,189,182,175,132,168] },
+        { name: "Gradient_Ex_Sequence_22", colors: [188,187,145,139,133,132,168,132,133,139,145,187,188] },
+        { name: "Gradient_Ex_Sequence_23", colors: [138,139,140,176,212,140,139,174,211,212] },
+        { name: "Gradient_Ex_Sequence_24", colors: [28,64,100,136,172,208,172,136,100] },
+        { name: "Gradient_Ex_Sequence_25", colors: [52,88,124,160,196,232,196,160,124] },
+        { name: "Gradient_Ex_Sequence_26", colors: [82,112,142,172] },
+        { name: "Gradient Sequence 27", colors: [97,97,97,97,61,61,61,61,62,62,62,62,98,98,98,98] },
+        { name: "Gradient Sequence 28", colors: [72,84,120,156,192,228,192,156,120] },
+        { name: "Gradient Sequence 29", colors: [82,88,124,160,196,232,196,160,124] },
+        { name: "Gradient Sequence 30", colors: [121,122,123,124,125,126,127,128,129,130] },
+        { name: "Gradient Sequence 31", colors: [162,199,127,91,92,98,109,110,111,112,72,73,74,75,76] },
+        { name: "Gradient Sequence 32", colors: [34,33,32,31,30,29,30,31,32] },
+        { name: "Gradient Sequence 33", colors: [97,104,110,111,154,196] },
+        { name: "Gradient Sequence 34", colors: [149,143,137,138,217,103,67] },
+        { name: "Gradient Sequence 35", colors: [23,24,31,37,44,51,44,37,31] },
+        { name: "Gradient Sequence 36", colors: [95,54,24,30,36,42,48,42,36,30,24,54,95] },
+        { name: "Gradient Sequence 37", colors: [132,95,101,145,188,187,145,139,133] },
+        { name: "Gradient Sequence 38", colors: [90,91,92,93,94,95,96,97,98] }
+      ];
+
+      // Load custom gradients from localStorage and merge them.
+      let customGradients = loadCustomGradients();
+      let gradients = builtInGradients.concat(customGradients);
+      let originalText = "";
+
+      function populateGradientSelect() {
+        const select = document.getElementById("gradientSelect");
+        select.innerHTML = "";
+        gradients.forEach((g, idx) => {
+          const option = document.createElement("option");
+          option.value = g.name;
+          option.textContent = g.name;
+          option.dataset.gradientIndex = idx;
+          select.appendChild(option);
+        });
+        createGradientOptionPreviews();
+      }
+      function onGradientChange() { updateGradientPreview(); applyGradient(); }
+      function onPatternChange() { applyGradient(); }
+      function onTextPaste(event) {
+        const mode = getSelectedMode();
+        // Get the pasted text from clipboard
+        const pastedText = (event.clipboardData || window.clipboardData).getData('text');
+        // Check if the pasted text has color codes
+        const hasColorCodes = /\%\(\d{3}\)/.test(pastedText);
+        
+        if (hasColorCodes) {
+          // Prevent default paste behavior
+          event.preventDefault();
+          // Strip color codes for the input box (clean text for editing)
+          const cleanText = pastedText.replace(
+            /\%\(\d{3}\)/g,
+            ""
+          );
+          
+          // Get cursor position and insert clean text
+          const textInput = document.getElementById("textInput");
+          const startPos = textInput.selectionStart;
+          const endPos = textInput.selectionEnd;
+          const currentValue = textInput.value;
+          
+          // Insert clean text at cursor position
+          const newValue = currentValue.substring(0, startPos) + cleanText + currentValue.substring(endPos);
+          textInput.value = newValue;
+          
+          // Set cursor position after inserted text
+          const newCursorPos = startPos + cleanText.length;
+          textInput.setSelectionRange(newCursorPos, newCursorPos);
+          
+          // Update originalText for edit mode
+          originalText = newValue;
+          
+          // Apply gradient to the updated text (this will properly update both preview and copyable output)
+          applyGradient();
+        }
+        // If no color codes, let the normal paste happen and onTextInput will handle it
+      }
+
+      function onTextInput(event) {
+        const mode = getSelectedMode();
+        const textInput = document.getElementById("textInput");
+        const text = textInput.value;
+        const cursorPos = textInput.selectionStart;
+        
+        if (mode === "edit") {
+          // Text is already clean, just store it
+          originalText = text;
+          
+          // Store the cursor position to restore after gradient
+          window.savedPlainCursorPos = cursorPos;
+          
+          applyGradient();
+        } else {
+          // In viewer mode, update copyable output and preview
+          document.getElementById("copyableOutput").value = text;
+          updateOutput();
+        }
+      }
+
+      function getSelectedMode() {
+        const modes = document.getElementsByName("mode");
+        for (const mode of modes) {
+          if (mode.checked) return mode.value;
+        }
+        return "edit";
+      }
+
+      const modeSelectors = document.getElementsByName("mode");
+      modeSelectors.forEach((modeSelector) => {
+        modeSelector.addEventListener("change", () => {
+          if (getSelectedMode() === "view") {
+            document.getElementById("gradientControls").classList.add("disabled");
+          } else {
+            document.getElementById("gradientControls").classList.remove("disabled");
+          }
+          updateOutput();
+        });
+      });
+
+      // Toggle Custom Gradient Section
+      document.getElementById("toggleCustomGradientButton").addEventListener("click", function () {
+        const addGradientDiv = document.getElementById("addGradient");
+        if (addGradientDiv.style.display === "none" || addGradientDiv.style.display === "") {
+          addGradientDiv.style.display = "block";
+          this.value = "Hide custom gradient";
+        } else {
+          addGradientDiv.style.display = "none";
+          this.value = "Create custom gradient";
+        }
+      });
+
+      // Toggle Manage Custom Gradients Section
+      document.getElementById("toggleManageCustomGradients").addEventListener("click", function () {
+        const manageDiv = document.getElementById("manageCustomGradients");
+        if (manageDiv.style.display === "none" || manageDiv.style.display === "") {
+          manageDiv.style.display = "block";
+          this.value = "Hide custom gradients";
+          populateCustomGradientsList();
+        } else {
+          manageDiv.style.display = "none";
+          this.value = "Manage custom gradients";
+        }
+      });
+
+      // Update the preview in the create custom gradient form
+      function updateCustomGradientPreview() {
+        const codesStr = document.getElementById("newGradientCodes").value.trim();
+        if (!codesStr) {
+          document.getElementById("customGradientPreview").style.background = "";
+          return;
+        }
+        const codes = codesStr.split(/\s+/).map(item => parseInt(item, 10));
+        if (codes.some(code => isNaN(code) || code < 0 || code > 255)) {
+          document.getElementById("customGradientPreview").style.background = "";
+          return;
+        }
+        const colors = codes.map(xtermToRgbHex);
+        let backgroundStyle = "";
+        if (colors.length > 1) {
+          backgroundStyle = `linear-gradient(to right, ${colors.join(", ")})`;
+        } else if (colors.length === 1) {
+          backgroundStyle = colors[0];
+        }
+        document.getElementById("customGradientPreview").style.background = backgroundStyle;
+      }
+      document.getElementById("newGradientCodes").addEventListener("input", updateCustomGradientPreview);
+
+      // Remove "invalid" class on input when valid
+      document.getElementById("newGradientName").addEventListener("input", function () {
+        if (this.validity.valid) this.classList.remove("invalid");
+      });
+      document.getElementById("newGradientCodes").addEventListener("input", function () {
+        if (this.validity.valid) this.classList.remove("invalid");
+      });
+
+      // This function adds the gradient and verifies valid color codes.
+      function verifyAndAddGradient() {
+        const gName = document.getElementById("newGradientName").value;
+        const gColors = [];
+        const colorCodes = document.getElementById("newGradientCodes").value.split(" ");
+        const wasConverted = colorCodes.every((item) => {
+          const conversion = parseInt(item);
+          if (!isNaN(conversion) && conversion >= 0 && conversion <= 255) {
+            gColors.push(conversion);
+            return true;
+          } else {
+            return false;
+          }
+        });
+        if (wasConverted) {
+          customGradients.push({
+            name: gName,
+            colors: gColors
+          });
+          saveCustomGradients();
+          gradients = builtInGradients.concat(customGradients);
+          populateGradientSelect();
+          document.getElementById("newGradientName").value = "";
+          document.getElementById("newGradientCodes").value = "";
+          document.getElementById("customGradientPreview").style.background = "";
+        } else {
+          alert("Color codes must be a space separated list of numbers between 0 and 255.");
+        }
+      }
+
+      // Ignore the click if the input isn't valid and trigger shake animation.
+      function addGradientClick() {
+        const nameInput = document.getElementById("newGradientName");
+        const codesInput = document.getElementById("newGradientCodes");
+        if (nameInput.validity.valid && codesInput.validity.valid) {
+          verifyAndAddGradient();
+        } else {
+          if (!nameInput.validity.valid) {
+            nameInput.classList.add("invalid", "shake");
+            nameInput.addEventListener("animationend", () => {
+              nameInput.classList.remove("shake");
+            }, { once: true });
+          }
+          if (!codesInput.validity.valid) {
+            codesInput.classList.add("invalid", "shake");
+            codesInput.addEventListener("animationend", () => {
+              codesInput.classList.remove("shake");
+            }, { once: true });
+          }
+        }
+      }
+      document.getElementById("newGradientProcess").addEventListener("click", addGradientClick);
+
+      // --- Editing Custom Gradients in the Management Section ---
+
+      // Update the preview for an editable custom gradient
+      function updateEditGradientPreview(codesString, previewBox) {
+        const codesArr = codesString.trim().split(/\s+/).map(item => parseInt(item, 10));
+        if (codesArr.some(code => isNaN(code) || code < 0 || code > 255)) {
+          previewBox.style.background = "";
+          return;
+        }
+        const colors = codesArr.map(xtermToRgbHex);
+        let backgroundStyle = "";
+        if (colors.length > 1) {
+          backgroundStyle = `linear-gradient(to right, ${colors.join(", ")})`;
+        } else if (colors.length === 1) {
+          backgroundStyle = colors[0];
+        }
+        previewBox.style.background = backgroundStyle;
+      }
+
+      // Populate the list of custom gradients for management (with inline editing)
+      function populateCustomGradientsList() {
+        const container = document.getElementById("customGradientsList");
+        container.innerHTML = "";
+        if (customGradients.length === 0) {
+          container.innerHTML = "<p>No custom gradients added.</p>";
+          return;
+        }
+        customGradients.forEach((grad, index) => {
+          const gradDiv = document.createElement("div");
+          gradDiv.classList.add("custom-gradient-item");
+
+          // Preview box
+          const previewBox = document.createElement("div");
+          previewBox.classList.add("custom-gradient-preview");
+          // Initially update preview using stored codes
+          updateEditGradientPreview(grad.colors.join(" "), previewBox);
+
+          // Name input
+          const nameInput = document.createElement("input");
+          nameInput.type = "text";
+          nameInput.classList.add("edit-gradient-name");
+          nameInput.value = grad.name;
+
+          // Codes input
+          const codesInput = document.createElement("input");
+          codesInput.type = "text";
+          codesInput.classList.add("edit-gradient-codes");
+          codesInput.value = grad.colors.join(" ");
+          codesInput.addEventListener("input", function() {
+            updateEditGradientPreview(this.value, previewBox);
+          });
+
+          // Save button
+          const saveBtn = document.createElement("button");
+          saveBtn.textContent = "Save";
+          saveBtn.addEventListener("click", function() {
+            saveEditedGradient(index, nameInput, codesInput);
+          });
+
+          // Remove button
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = "Remove";
+          removeBtn.addEventListener("click", function() {
+            removeCustomGradient(index);
+          });
+
+          gradDiv.appendChild(previewBox);
+          gradDiv.appendChild(nameInput);
+          gradDiv.appendChild(codesInput);
+          gradDiv.appendChild(saveBtn);
+          gradDiv.appendChild(removeBtn);
+
+          container.appendChild(gradDiv);
+        });
+      }
+
+      // Save the edited custom gradient
+      function saveEditedGradient(index, nameInput, codesInput) {
+        const newName = nameInput.value.trim();
+        const codesStr = codesInput.value.trim();
+        if (!newName.match(/^[\w\s]+$/)) {
+          nameInput.classList.add("invalid", "shake");
+          nameInput.addEventListener("animationend", () => {
+            nameInput.classList.remove("shake");
+          }, { once: true });
+          return;
+        }
+        if (!codesStr.match(/^(?:[0-9]{1,3}(?:\s+[0-9]{1,3})*)$/)) {
+          codesInput.classList.add("invalid", "shake");
+          codesInput.addEventListener("animationend", () => {
+            codesInput.classList.remove("shake");
+          }, { once: true });
+          return;
+        }
+        const codesArr = codesStr.split(/\s+/).map(item => parseInt(item, 10));
+        if (codesArr.some(code => isNaN(code) || code < 0 || code > 255)) {
+          codesInput.classList.add("invalid", "shake");
+          codesInput.addEventListener("animationend", () => {
+            codesInput.classList.remove("shake");
+          }, { once: true });
+          return;
+        }
+        customGradients[index].name = newName;
+        customGradients[index].colors = codesArr;
+        saveCustomGradients();
+        gradients = builtInGradients.concat(customGradients);
+        populateGradientSelect();
+        populateCustomGradientsList();
+      }
+
+      // Remove a custom gradient
+      function removeCustomGradient(index) {
+        customGradients.splice(index, 1);
+        saveCustomGradients();
+        gradients = builtInGradients.concat(customGradients);
+        populateGradientSelect();
+        populateCustomGradientsList();
+      }
+
+      // Format conversion event
+
+      function initialize() {
+        populateGradientSelect();
+        updateGradientPreview();
+        updateOutput();
+        // If the create-gradient form already has color codes, update its preview.
+        updateCustomGradientPreview();
+      }
+
+      document.getElementById("textInput").addEventListener("input", onTextInput);
+      document.getElementById("textInput").addEventListener("paste", onTextPaste);
+      document.getElementById("gradientSelect").addEventListener("change", onGradientChange);
+      document.getElementById("patternSelect").addEventListener("change", onPatternChange);
+      document.getElementById("invertGradient").addEventListener("change", onGradientChange);
+
+      // Format button event listener
+      document.getElementById("formatButton").addEventListener("click", function() {
+        const textInput = document.getElementById("textInput");
+        const formattedText = formatText(textInput.value);
+        textInput.value = formattedText;
+          // Update original text with the formatted clean text
+          originalText = formattedText;
+          applyGradient();
+      });
+
+      // Copy button functionality
+      document.getElementById("copyButton").addEventListener("click", async function() {
+        let copyableOutput = document.getElementById("copyableOutput");
+        const copyButton = this;
+
+        try {
+          // Use the modern Clipboard API if available
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(copyableOutput.value.replaceAll("%(00","%(").replaceAll("%(0","%("));
+          } else {
+            // Fallback for older browsers
+            copyableOutput.select();
+            copyableOutput.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            copyableOutput.setSelectionRange(0, 0); // Clear selection
+          }
+          
+          // Show feedback that copy was successful
+          copyButton.textContent = "Copied!";
+          copyButton.classList.add("copied");
+          
+          // Reset button after 2 seconds
+          setTimeout(() => { copyButton.textContent = "Copy"; copyButton.classList.remove("copied"); }, 2000);
+          
+        } catch (err) {
+          // Show error feedback
+          copyButton.textContent = "Failed"; setTimeout(() => { copyButton.textContent = "Copy"; }, 2000);
+        }
+      });
+
+      initialize();
+    </script>
+  
+</body></html>

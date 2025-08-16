@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,26 +18,20 @@
   border-left: 1px solid #ffffff;
   cursor: pointer;
 }
-
 @media only screen and (max-width: 999px) { .color { width: 25px; } }
-
 @media only screen and (max-width: 699px) { .color { width: 20px; } }
-
 body {
   background-color: black;
   color: #AAAAAA;
   font-family: "Source Code Pro";
 }
-
 #editor-container {
   position: relative;
   width: 99%;
   height: 150px;
   margin-bottom: 15px;
 }
-
 #editor-container, #textInput, #highlightLayer {}
-
 #textInput, #highlightLayer {
   position: absolute;
   top: 0;
@@ -61,35 +54,21 @@ body {
   z-index: 1;
   color: transparent;
   background-color: transparent;
-  caret-color: #AAAAAA;
+  caret-color: #AAA;
 }
-
 #highlightLayer {
   z-index: 0;
   pointer-events: none;
 }
-
-.highlight {
-  color: #696969;
-  font-weight: bold;
-
-}
-
-.highlightNormal {
-  color: #3a3a3a;
-  font-weight: bold;
-}
-
+.highlight { color: #696969;}
+.highlightNormal { color: #3a3a3a;}
 .footer {
   position: relative;
   right: 10px;
   text-align: right;
   width: 100%;
 }
-
-a {
-  color: #AAAAAA;
-}
+a { color: #AAAAAA; }
 	</style>
 </head>
 
@@ -227,15 +206,11 @@ a {
 					paragraphResult += paragraph[currentIndex];
 					currentIndex++;
 				}
-
 				result += `<span>${paragraphResult}</span><br>`;
 			});
-
 			outputElement.innerHTML = result;
 		}
-
 		updateHighlight();
 	</script>
 </body>
-
 </html>

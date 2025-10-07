@@ -27,7 +27,7 @@ a { color: #aaa; }
 		<textarea id="textInput" placeholder="Enter text to be recolored..." spellcheck="true"
 			oninput="updateOutput()"></textarea>
 	</div>
-	<div id="output" style="white-space:pre;">Colored text will appear here</div>
+	<div id="output" style="white-space:break-spaces;">Colored text will appear here</div>
 	<br><br><div class="footer">Ensure you close all tags with '%normal' before changing colors ⚜ <a href="/">With textbox highlighting</a> ⚜ <a href="/gradient">Gradient Maker</a></div>
 
 	<script>
@@ -132,7 +132,7 @@ a { color: #aaa; }
           return colorDict[colorIndex];
       }
       function escapeHtml(text) {
-        const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
+        const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"};
         return text.replace(/[&<>"']/g, function (m) {return map[m];});
       }
       </script>

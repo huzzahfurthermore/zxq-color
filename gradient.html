@@ -702,7 +702,13 @@ b
         const colors = codes.map(xtermToRgbHex);
         let backgroundStyle = "";
         if (colors.length > 1) {
-          backgroundStyle = `linear-gradient(to right, ${colors.join(", ")})`;
+          lengthy=colors.length;percents=100/lengthy;currentPercent=0;colorHolder=[];
+          for (i in colors) {
+              if (i==0) { colorHolder.push(colors[i] + " 0%"); currentPercent+=percents; }
+              else { colorHolder.push(colors[i-1] + ` ${currentPercent}%`); colorHolder.push(colors[i] + ` ${currentPercent}%`); currentPercent+=percents; }
+          }
+          backgroundStyle = `linear-gradient(to right, ${colorHolder.join(", ")})`;
+          //backgroundStyle = `linear-gradient(to right, ${colors.join(", ")})`;
         } else if (colors.length === 1) {
           backgroundStyle = colors[0];
         }
@@ -783,7 +789,13 @@ b
         const colors = codesArr.map(xtermToRgbHex);
         let backgroundStyle = "";
         if (colors.length > 1) {
-          backgroundStyle = `linear-gradient(to right, ${colors.join(", ")})`;
+          lengthy=colors.length;percents=100/lengthy;currentPercent=0;colorHolder=[];
+          for (i in colors) {
+              if (i==0) { colorHolder.push(colors[i] + " 0%"); currentPercent+=percents; }
+              else { colorHolder.push(colors[i-1] + ` ${currentPercent}%`); colorHolder.push(colors[i] + ` ${currentPercent}%`); currentPercent+=percents; }
+          }
+          backgroundStyle = `linear-gradient(to right, ${colorHolder.join(", ")})`;
+          //backgroundStyle = `linear-gradient(to right, ${colors.join(", ")})`;
         } else if (colors.length === 1) {
           backgroundStyle = colors[0];
         }

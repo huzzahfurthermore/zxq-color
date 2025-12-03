@@ -6,7 +6,7 @@
          Please leave this line in the code. Preferably we can collaborate and you can just make a pull request. -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sindome Gradient Generator</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎨</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖌️</text></svg>">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Quantico:400,400italic,700">
     <style>
 #output,textarea{border:1px solid #444;background-color:#111;padding:10px}body,label,textarea{color:#fff}#output,select,textarea{background-color:#111}.custom-gradient-item input[type=text],label,select{margin-right:5px}body{background-color:#000;font-family:"Source Code Pro",monospace;padding:20px}#output{white-space:pre-wrap;}#controls,label{font-size:1rem}textarea{width:100%;height:150px;font-family:inherit;resize:vertical}.custom-gradient-input,select{padding:5px;color:#fff;border:1px solid #444;font-family:inherit}.preview-box{display:inline-block;vertical-align:middle;width:100px;height:20px;margin-left:5px;border:1px solid #444;background:#000}.mode-selector input{margin-right:5px}.disabled{opacity:.5;pointer-events:none}.custom-gradient-input{background-color:#111}#toggleCustomGradientButton,#toggleManageCustomGradients{background-color:#111;color:#fff;border:1px solid #444;padding:5px 10px;font-family:inherit;cursor:pointer;margin-bottom:10px}@keyframes shake{0%,100%{transform:translateX(0)}25%,75%{transform:translateX(-5px)}50%{transform:translateX(5px)}}.shake{animation:.3s shake}.invalid{border:2px solid red!important}#manageCustomGradients{display:none;border:1px solid #444;padding:10px;margin-top:10px}#manageCustomGradients h3{margin-top:0}.help-text{font-size:.8rem;color:#888}.custom-gradient-item{display:flex;align-items:center;margin-bottom:5px;border-bottom:1px solid #444;padding-bottom:5px}.custom-gradient-preview{width:80px;height:20px;border:1px solid #444;margin-right:10px}.cred,#charCounter{float:right;color:#888;font-size:.9rem;margin-top:5px}#charCounter.over-limit,.line-char-count.over-limit{color:red}.output-container{position:relative}.line-char-count{color:#666;font-size:.8rem;display:inline-block;margin-left:10px;user-select:none;white-space:nowrap;position:absolute;right:10px}.copy-container{position:relative;display:inline-block;width:100%}.copy-button{position:absolute;top:8px;right:8px;background-color:#333;color:#fff;border:1px solid #555;padding:6px 12px;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:4px;z-index:10;transition:.2s}.copy-button:hover{background-color:#444;border-color:#666}.copy-button:active{background-color:#222;transform:translateY(1px)}.copy-button.copied{background-color:#0a5d0a;border-color:#0f8f0f}a,a:visited{font-size:1rem;color:#aaa;}
@@ -21,7 +21,7 @@
       <div id="gradientControls" style="display:flex;justify-content:space-between;">
           <div>
         <div>
-          <label for="gradientSelect">Gradient:</label><select id="gradientSelect"></select><span class="preview-box" id="gradientPreview" style="background: linear-gradient(to right, rgb(255, 255, 0), rgb(204, 255, 0), rgb(102, 255, 51), rgb(51, 255, 102), rgb(0, 255, 204), rgb(0, 255, 255), rgb(0, 204, 255), rgb(51, 102, 255), rgb(102, 51, 255), rgb(204, 0, 255), rgb(255, 0, 255), rgb(255, 0, 204), rgb(255, 51, 153), rgb(255, 51, 102), rgb(255, 102, 51), rgb(255, 153, 51), rgb(255, 204, 0));"></span>
+          <label for="gradientSelect">Gradient:</label><select id="gradientSelect"></select><span class="preview-box" id="gradientPreview" style=""></span>
           <input type="checkbox" id="invertGradient"><label for="invertGradient">Invert</label>
         
         <!-- Pattern Selection -->
@@ -46,8 +46,8 @@
             <input type="text" id="newGradientName" placeholder="Gradient Name" required="" pattern="^[\w\s]+$" title="Enter a name (letters, numbers, and spaces only)" class="custom-gradient-input">
             <small class="help-text">Enter '@colors 256' in-game to see available colors</small>
             <br>
-            <input type="text" id="newGradientCodes" placeholder="Color Codes" required="" pattern="^(?:[0-9]{1,3}(?:\s+[0-9]{1,3})*)$" title="Enter space-separated numbers between 1 and 256" class="custom-gradient-input">
-            <small class="help-text">E.g.: 54 55 56 57</small>
+            <input type="text" id="newGradientCodes" placeholder="E.g.: 54 55 56 57" required="" pattern="^(?:[0-9]{1,3}(?:\s+[0-9]{1,3})*)$" title="Enter space-separated numbers between 1 and 256" class="custom-gradient-input">
+            <small class="help-text"></small>
             <span class="preview-box" id="customGradientPreview"></span>
             <input type="button" id="newGradientProcess" value="Add" style="background-color: #111; color: white; border: 1px solid #444; padding: 5px 10px; font-family: inherit; cursor: pointer;">
           </div>
@@ -361,13 +361,9 @@ b
         const gradient = gradients[index];
         const colors = invert ? gradient.colors.slice().reverse() : gradient.colors;
         let gradientText = "";
-        if (pattern === "original") {
-          gradientText = applyOriginalPattern(text, colors);
-        } else if (pattern === "distributed") {
-          gradientText = distributeColorsEvenly(text, colors);
-        } else if (pattern === "symmetrical") {
-          gradientText = applySymmetricalPattern(text, colors);
-        }
+        if (pattern === "original") { gradientText = applyOriginalPattern(text, colors);
+        } else if (pattern === "distributed") { gradientText = distributeColorsEvenly(text, colors);
+        } else if (pattern === "symmetrical") { gradientText = applySymmetricalPattern(text, colors); }
         
         // Keep the input clean, put colored text in copyable output
         textInput.value = text;
@@ -393,7 +389,7 @@ b
         document.getElementById("charCounter").textContent = `Total Characters: ${cleanText.length}`;
       }
 
-      function updateGradientPreview() {
+      function updateGradientPreview() {colorHolder=[];
         const select = document.getElementById("gradientSelect");
         const index = select.selectedIndex;
         if (index < 0) return;
@@ -402,9 +398,15 @@ b
         if (gradient.colors.length > 1) {
           const invert = document.getElementById("invertGradient").checked;
           const colors = invert ? gradient.colors.slice().reverse() : gradient.colors;
-          preview.style.background = `linear-gradient(to right, ${colors
-            .map(xtermToRgbHex)
-            .join(", ")})`;
+          lengthy=colors.length;percents=100/lengthy;currentPercent=0;
+          for (i in colors) {
+              if (i==0) { colorHolder.push(xtermToRgbHex(colors[i]) + " 0%"); currentPercent+=percents; }
+              else { colorHolder.push(xtermToRgbHex(colors[i-1]) + ` ${currentPercent}%`); colorHolder.push(xtermToRgbHex(colors[i]) + ` ${currentPercent}%`); currentPercent+=percents; }
+          }
+          preview.style.background = `linear-gradient(to right, ${colorHolder.join(", ")})`;
+          //preview.style.background = `linear-gradient(to right, ${colors
+          //  .map(xtermToRgbHex)
+          //  .join(", ")})`;
         } else if (gradient.colors.length === 1) {
           preview.style.background = `${xtermToRgbHex(gradient.colors[0])}`;
         } else { preview.style.background = `black`; }
@@ -644,9 +646,7 @@ b
 
       function getSelectedMode() {
         const modes = document.getElementsByName("mode");
-        for (const mode of modes) {
-          if (mode.checked) return mode.value;
-        }
+        for (const mode of modes) { if (mode.checked) return mode.value; }
         return "edit";
       }
 

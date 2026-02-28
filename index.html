@@ -17,14 +17,14 @@ body { background-color: black; color: #aaa; font-family: "Source Code Pro"; }
 textarea { resize: none; }
 .highlight { color: #696969; }
 .highlightNormal { color: #3a3a3a; }
-.footer { position: relative; right: 10px; text-align: right; width: 100%; }
+footer { position: relative; right: 10px; text-align: right; width: 100%; }
 a { color: #aaa; }
 .colorText { text-shadow:1px 1px 0 #000;color:white; }
 button{border-radius: 0;background:mediumseagreen;border: none;}.off{background: indianred;}
 	</style>
 </head>
 
-<body onbeforeunload="return myFunction()" onload="document.getElementById('output').focus();colorBuild()">
+<body onbeforeunload="return myFunction()" onload="document.getElementById('output').focus();colorBuild();">
 	<div id="colorPalette" style="display: grid;grid-template-columns: repeat(auto-fit, minmax(61px, 0fr));row-gap: 4px;column-gap: 0px;"></div>
 	<div id="editor-container">
 		<textarea id="textInput" placeholder="Enter text to be recolored..." spellcheck="true"
@@ -32,7 +32,11 @@ button{border-radius: 0;background:mediumseagreen;border: none;}.off{background:
 		<div id="highlightLayer"></div>
 	</div>
 	<div id="output" style="white-space:break-spaces;outline:none;caret-color:transparent;" spellcheck="true" contenteditable="true" oninput="updateOutput();">Colored text will appear here</div>
-	<br><br><div class="footer"><button onclick="editor=document.getElementById('output');editor.spellcheck = !editor.spellcheck;editor.focus();editor.blur();this.classList.toggle('off')">Spellcheck</button> ⚜ <button onclick="contrastCheck=!contrastCheck;colorBuild();this.classList.toggle('off')" class="off">Contrast Check</button> ⚜ Ensure you close tags with '%normal' before going to a new line ⚜ <a href="/alt">No textbox highlighting</a> ⚜ <a href="/gradient">Gradient Maker</a></div>
+	<br><br>
+	<footer style="display: grid;grid-template-columns: repeat(2, 1fr);">
+	  <details style="justify-self: left;margin-left: 12px;text-align: left;"><summary style="">Links</summary><span style="text-align: left;position: relative;"><a href="/alt">No textbox highlighting</a> ⚜ <a href="/gradient">Gradient Maker</a> ⚜ 
+	 <a href="https://maligyilu.goatcounter.com/">Analytics</a></span></details>
+	  <span><button onclick="editor=document.getElementById('output');editor.spellcheck = !editor.spellcheck;editor.focus();editor.blur();this.classList.toggle('off')">Spellcheck</button> ⚜ <button onclick="contrastCheck=!contrastCheck;colorBuild();this.classList.toggle('off')" class="off">Contrast Check</button> ⚜ Close tags with '%normal' before going to a new line</span></footer>
 
 	<script>
 	  function myFunction() { return "Input is not saved."; }
@@ -179,6 +183,9 @@ button{border-radius: 0;background:mediumseagreen;border: none;}.off{background:
               if(AA=="fail"){timmy.push([index,"0"]);}else{timmy.push([index,"1"])}
           })
         }
+        async function goat() {document.footer.innerHTML += '<img src="https://maligyilu.goatcounter.com/count?s&p=/">'}
+        goat();
       </script>
+      
   </body>
 </html>

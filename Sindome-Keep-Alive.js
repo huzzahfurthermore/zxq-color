@@ -21,7 +21,7 @@
     var audioHTML = `<audio id="btn-audio" onended="this.play();" autobuffer onload="songT=false;"> <source src="${audioSource}" type="audio/mpeg"> </audio>`;
     // Create new button HTML
     var btnHTML = '<button class="btn btn-primary btn-xs" type="button" title="toggle audio" onclick="try{songT=!songT}catch{songT=true}var aud=document.getElementById(`btn-audio`);aud.volume=0.1;if(songT){aud.play();}else{aud.pause();}"><span class="hidden-xs">🎤</span></button>';
-    // Add audioHTML & audioJS to head
+    // Add audioHTML to head
     head.innerHTML += audioHTML;
     // Add btnHTML to buttonHolder
     buttonHolder.innerHTML += btnHTML;

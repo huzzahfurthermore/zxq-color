@@ -5,32 +5,34 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼️</text></svg>">
   <title>Sindome Art Colorizer</title>
-	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Source+Code+Pro">
+	<!--<link rel="stylesheet" href="https://fonts.upset.dev/css?family=Source+Code+Pro">-->
 	<style>
-.color { display: inline-block; margin-right: 10px; margin-bottom: 5px; width: 50px; height: 20px; border-right: 1px solid #ffffff; border-left: 1px solid #fff; cursor: pointer; }
-body { background-color: black; color: #aaa; font-family: "Source Code Pro"; }
+*{--font: "Source Code Pro",Consolas,"Lucida Console",monospace;}
+@font-face{font-family: 'Source Code Pro';font-style: normal;font-weight: 400;src: url('Source.woff2') format('woff2');}
+.color { display: inline-block; margin-right: 10px; margin-bottom: 5px; width: 50px; height: 20px; border-right: 1px solid #fff; border-left: 1px solid #fff; cursor: pointer; }
+body { background-color: #000; color: #aaa; font-family:var(--font);}
 #editor-container { position: relative; width: 100%; height: 150px; margin-bottom: 15px; }
 #editor-container, #textInput, #highlightLayer {}
-#textInput, #highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 0; padding: 5px; font-family: "Source Code Pro", monospace; font-size: 14px; line-height: 1.25; background-color: transparent; color: #aaa; white-space: pre-wrap; border: 1px solid #ccc; overflow: scroll; box-sizing: border-box; }
+#textInput, #highlightLayer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 0; padding: 5px; font-family:var(--font); font-size: 14px; line-height: 1.25; background-color: transparent; color: #aaa; white-space: pre-wrap; border: 1px solid #ccc; overflow: scroll; box-sizing: border-box; }
 #textInput { z-index: 1; color: transparent; background-color: transparent; caret-color: #aaa; overflow-wrap: anywhere;}
 #highlightLayer { z-index: 0; pointer-events: none; overflow-wrap: anywhere;}
 textarea { resize: none; }
 .highlight { color: #696969; }
 .highlightNormal { color: #3a3a3a; }
 footer { position: relative; right: 10px; text-align: right; width: 100%; }
-a { color: #aaa; }
-.colorText { text-shadow: rgb(0, 0, 0) 1px 0px 0px, rgb(0, 0, 0) 0.540302px 0.841471px 0px, rgb(0, 0, 0) -0.416147px 0.909297px 0px, rgb(0, 0, 0) -0.989993px 0.14112px 0px, rgb(0, 0, 0) -0.653644px -0.756803px 0px, rgb(0, 0, 0) 0.283662px -0.958924px 0px, rgb(0, 0, 0) 0.96017px -0.279416px 0px;color:white; }
-button{border-radius: 0;background:mediumseagreen;border: none;}.off{background: indianred;}
+a { color: #aaa; transition:1s color ease} a:hover{color:pink;}
+.colorText { text-shadow: #000 1px 0px 0px, #000 0.540302px 0.841471px 0px, #000 -0.416147px 0.909297px 0px, #000 -0.989993px 0.14112px 0px, #000 -0.653644px -0.756803px 0px, #000 0.283662px -0.958924px 0px, #000 0.96017px -0.279416px 0px;color:white; }
+button{border-radius: 0;background:#3cb371;border: none;}.off{background: #cd5c5c;}
 	</style>
 </head>
 
 <body onbeforeunload="return myFunction()" onload="document.getElementById('output').focus();colorBuild();">
 	<div id="colorPalette" style="display: grid;grid-template-columns: repeat(auto-fit, minmax(61px, 0fr));row-gap: 4px;column-gap: 0px;"></div>
 	<div id="editor-container">
-		<textarea id="textInput" placeholder="Enter text to be recolored..." spellcheck="true" oninput="updateHighlight(); updateOutput();"></textarea>
+		<textarea id="textInput" placeholder="Enter text to be recolored..." spellcheck="false" oninput="updateHighlight(); updateOutput();"></textarea>
 		<div id="highlightLayer"></div>
 	</div>
-	<div id="output" style="white-space:break-spaces;outline:none;caret-color:transparent;" spellcheck="true" contenteditable="true" oninput="updateOutput();">Colored text will appear here</div>
+	<div id="output" style="white-space:break-spaces;outline:none;caret-color:transparent;position: relative;" spellcheck="true" contenteditable="true" oninput="updateOutput();">Colored text will appear here</div>
 	<br><br>
 	<footer style="display: grid;grid-template-columns: repeat(2, 1fr);">
 		<details style="justify-self: left;margin-left: 12px;text-align: left;">
@@ -39,7 +41,11 @@ button{border-radius: 0;background:mediumseagreen;border: none;}.off{background:
 				⚜
 				<a href="/gradient">Gradient Maker</a>
 				⚜
-				<a href="https://maligyilu.goatcounter.com/">Analytics</a>
+				<a href="/AccessibleArt">Accessible Art</a>
+				<br>
+				<a href="/pronounTagger">Pronoun Tagger</a>
+				⚜
+				<a href="/ThemeBuilder">Theme Builder</a>
 			</span>
 		</details>
 		<span>
@@ -169,9 +175,7 @@ button{border-radius: 0;background:mediumseagreen;border: none;}.off{background:
         document.getElementById("output").innerHTML = renderXterm(textToRender);
       }
       
-      function xtermToRgbHex(colorIndex) {
-          return colorDict[colorIndex];
-      }
+      function xtermToRgbHex(colorIndex) {return colorDict[colorIndex];}
       function escapeHtml(text) {
         const map = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" };
         return text.replace(/[&<>"']/g, function (m) {return map[m];});
@@ -198,8 +202,13 @@ button{border-radius: 0;background:mediumseagreen;border: none;}.off{background:
               if(AA=="fail"){timmy.push([index,"0"]);}else{timmy.push([index,"1"])}
           })
         }
-        async function goat() {document.footer.innerHTML += '<img src="https://maligyilu.goatcounter.com/count?s&p=/">'}
-        goat();
+
+function backgroundText(text){return '<div>'+text.replaceAll(/(%\(\d+\)|%normal|%bright)/g,'<span style="font-size:0%;">$1</span>')+'</div>';}
+	  function codeOutputUpdate(){
+	    codeOutput=document.getElementById("codeOutput").innerHTML;
+	    updateOutput(codeOutput.replaceAll(/<span.+?>|<\/span>|<div.+?>|<\/div>/g,''));
+	  }
       </script>
+      
   </body>
 </html>
